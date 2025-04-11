@@ -1,0 +1,9 @@
+name: ref_record
+version: 0.1.0
+
+authors:
+  - konovod <konovod@gmail.com>
+
+crystal: '>= 1.16.0-dev'
+
+license: MIT
