@@ -1,13 +1,8 @@
 require "./spec_helper"
 
-ref_record Point, x : Int32, y : Int32
-ref_record Line, start : TPoint, finish : TPoint, color : String
-
-ref_record SomeStruct, header : UInt32[4], data : UInt8[0]
+ref_record Point, x : Int32, y : Int32 = -1
 
 describe "ref_record" do
-  # TODO: Write tests
-
   it "allows to get and set fields" do
     point = Point.new(123, 456)
     p1 = RefPoint.new(pointerof(point))
@@ -24,8 +19,12 @@ describe "ref_record" do
     p2.x = 10
     p1.x.should eq 10
   end
+end
 
-  it "access to inner members" do
+ref_record Line, start : StructPoint, finish : StructPoint, color : String
+
+describe "ref_record" do
+  it "provides accessors to inner members" do
     line = Line.new(Point.new(123, 456), Point.new(789, 1000), "White")
     l1 = RefLine.new(pointerof(line))
     l1.start.x += 1
@@ -40,3 +39,5 @@ describe "ref_record" do
     ptr.value.should eq line.start.x
   end
 end
+
+# ref_record SomeStruct, header : UInt32[4], data : UInt8[0]

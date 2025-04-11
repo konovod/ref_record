@@ -22,38 +22,19 @@ abstract struct RefStruct(T)
 end
 
 macro ref_record(name, *properties)
-  struct {{name.id}}
-    {% for prop in properties %}
+  {% for prop in properties %}
     {% if !prop.is_a?(TypeDeclaration) %}
       {% raise "Type must be explicit in ref_record: #{prop}" %}
     {% end %}
-    {% typ = prop.type.id %}    
-    {% if prop.type.id.starts_with?("T") %} 
-      {% typ = typ[1..] %}
-    {% end %}    
-      {% if prop.value %} 
-        property {{prop.var.id}} : {{typ}} = {{prop.value}}
-      {% else %}    
-        property {{prop.var.id}} : {{typ}}
-      {% end %}    
+  {% end %}
+
+  record({{name}}, {{properties.splat}}) do
+    {% for prop in properties %}
+      setter {{prop.var}}
     {% end %}
-
-    def initialize({{
-                     properties.map do |field|
-                       "@#{field.var.id}".id
-                     end.splat
-                   }})
-    end
-    {{yield}}
-
-    def clone
-      self.class.new({{
-                       properties.map do |property|
-                         "@#{property.var.id}.clone".id
-                       end.splat
-                     }})
-    end
   end
+
+  alias Struct{{name}} = {{name}}
 
   struct Ref{{name.id}} < RefStruct({{name.id}})
     @raw : Pointer({{name.id}})
@@ -64,8 +45,8 @@ macro ref_record(name, *properties)
     {% for prop in properties %}
       {% typ = prop.type.id %}
       {% is_struct = false %}
-      {% if prop.type.id.starts_with?("T") %}
-        {% typ = typ[1..] %}
+      {% if prop.type.id.starts_with?("Struct") %}
+        {% typ = typ[6..] %}      
         {% is_struct = true %}
       {% end %}
       def {{prop.var.id}}=(value : {{typ}})
