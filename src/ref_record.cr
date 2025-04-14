@@ -1,26 +1,32 @@
 abstract struct RefStruct(T)
+  # Creates reference to newly allocated struct
   def self.malloc
     self.new(Pointer(T).malloc(1))
   end
 
+  # Returns underlying struct value (by copy)
   def value
     @raw.value
   end
 
+  # Set underlying struct value
   def value=(v : T)
     @raw.value = v
   end
 
+  # create reference from any pointer (unsafe)
   def self.unsafe_from(ptr)
     self.new(ptr.as(Pointer(T)))
   end
 
+  # create reference from Bytes interpreting memory them as struct
   def self.from(bytes : Bytes)
     raise "size too small" if bytes.size < sizeof(T)
     self.new(bytes.to_unsafe.as(Pointer(T)))
   end
 end
 
+# Macros similar to `record`, but also define RefStruct descendant
 macro ref_record(name, *properties)
   {% for prop in properties %}
     {% if !prop.is_a?(TypeDeclaration) %}

@@ -34,6 +34,8 @@ pt.y += 1
 puts pt, v
 ```
 
+### Structs nesting
+
 You can nest structures, but to make it possible you have to mark struct fields somehow, current way is prepending type name with `Struct`:
 ```crystal
 ref_record Point, x : Int32, y : Int32
@@ -41,6 +43,38 @@ ref_record Line, start : StructPoint, finish : StructPoint, color : String
 
 line = RefLine.new(pointerof(@some_field))
 line.start.x += 1
+```
+
+### Passing to functions
+
+References can be passed to functions (it has a type `RefTypeName < RefStruct(TypeName)`):
+```crystal
+ref_record Body, pos : Int32, speed : Int32
+
+def update(body : RefBody)
+  body.pos += body.speed
+end
+```
+
+### Pointers to fields
+
+For a low level manipulations, you can get pointer to a field from a reference to a struct.
+Use syntax `#ptr_<field_name>`:
+```
+    point = Point.new(123, 456)
+    p1 = RefPoint.new(pointerof(point))
+    ptr = p1.ptr_x
+    ptr.value = 10
+    puts p1 # => Point.new(10, 456)
+
+```
+
+To simplify support of C-style structs, `#ptr_XXX` for a fields with StaticArray type has a return type that points to element of array:
+
+```
+ref_record Protocol, header : StructHeader, data : UInt8[0]
+
+typeof(Protocol.ptr_data) # => Pointer(UInt8)
 ```
 
 ## Development

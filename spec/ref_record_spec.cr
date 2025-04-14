@@ -22,6 +22,7 @@ describe "ref_record" do
 end
 
 ref_record Line, start : StructPoint, finish : StructPoint, color : String
+ref_record SomeStruct, header : UInt32[4], data : UInt8[0]
 
 describe "ref_record" do
   it "provides accessors to inner members" do
@@ -38,6 +39,12 @@ describe "ref_record" do
     ptr.value += 1
     ptr.value.should eq line.start.x
   end
-end
 
-# ref_record SomeStruct, header : UInt32[4], data : UInt8[0]
+  it "pointers to array fields has correct type" do
+    ref = RefSomeStruct.malloc
+    typeof(ref.ptr_data).should eq Pointer(UInt8)
+
+    4.times { |i| ref.ptr_header[i] = 10 }
+    ref.header.should eq StaticArray[10, 10, 10, 10]
+  end
+end
