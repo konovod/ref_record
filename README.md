@@ -60,7 +60,7 @@ end
 
 For a low level manipulations, you can get pointer to a field from a reference to a struct.
 Use syntax `#ptr_<field_name>`:
-```
+```crystal
     point = Point.new(123, 456)
     p1 = RefPoint.new(pointerof(point))
     ptr = p1.ptr_x
@@ -71,7 +71,7 @@ Use syntax `#ptr_<field_name>`:
 
 To simplify support of C-style structs, `#ptr_XXX` for a fields with StaticArray type has a return type that points to element of array:
 
-```
+```crystal
 ref_record Protocol, header : StructHeader, data : UInt8[0]
 
 typeof(Protocol.ptr_data) # => Pointer(UInt8)
